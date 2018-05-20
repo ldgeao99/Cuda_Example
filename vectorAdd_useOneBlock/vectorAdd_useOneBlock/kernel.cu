@@ -1,4 +1,4 @@
-//±âº» ÄÚµå 
+//ê¸°ë³¸ ì½”ë“œ 
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
 
@@ -7,15 +7,15 @@
 cudaError_t addWithCuda(int *c, const int *a, const int *b, unsigned int size);
 
 
-//host¿¡¼­ È£Ãâ°¡´ÉÇÏ¸ç Device¿¡¼­ ½ÇÇàµÇ´Â ÇÔ¼ö Ä¿³ÎÇÔ¼ö Á¤ÀÇ
+//hostì—ì„œ í˜¸ì¶œê°€ëŠ¥í•˜ë©° Deviceì—ì„œ ì‹¤í–‰ë˜ëŠ” í•¨ìˆ˜ ì»¤ë„í•¨ìˆ˜ ì •ì˜
 __global__ void addKernel(int *c, const int *a, const int *b)
 {
-	int i = threadIdx.x; // kernelÀ» ½ÇÇàÇÒ °¢ thread¿¡°Ô´Â thread ID°¡ ÁÖ¾îÁö´Âµ¥, kernel ÇÔ¼ö ³»¿¡¼­ built-in variableÀÎ ¡®threadIdx¡¯·Î ¾×¼¼½º
+	int i = threadIdx.x; // kernelì„ ì‹¤í–‰í•  ê° threadì—ê²ŒëŠ” thread IDê°€ ì£¼ì–´ì§€ëŠ”ë°, kernel í•¨ìˆ˜ ë‚´ì—ì„œ built-in variableì¸ â€˜threadIdxâ€™ë¡œ ì•¡ì„¸ìŠ¤
 	c[i] = a[i] + b[i];
 	printf("%d\n", i);
 }
 
-//host¿¡¼­¸¸ È£Ãâ°¡´ÉÇÏ¸ç host¿¡¼­ ½ÇÇàµÇ´Â È£½ºÆ® ÇÔ¼ö Á¤ÀÇ
+//hostì—ì„œë§Œ í˜¸ì¶œê°€ëŠ¥í•˜ë©° hostì—ì„œ ì‹¤í–‰ë˜ëŠ” í˜¸ìŠ¤íŠ¸ í•¨ìˆ˜ ì •ì˜
 __host__ float hostFuncion()
 {
 	printf("hostFuncion called\n");
@@ -54,7 +54,7 @@ int main()
 }
 
 // Helper function for using CUDA to add vectors in parallel.
-cudaError_t addWithCuda(int *c, const int *a, const int *b, unsigned int size) //°á°ú¸¦ ³ÖÀ» º¤ÅÍ, º¤ÅÍ1, º¤ÅÍ2, º¤ÅÍ »çÀÌÁî
+cudaError_t addWithCuda(int *c, const int *a, const int *b, unsigned int size) //ê²°ê³¼ë¥¼ ë„£ì„ ë²¡í„°, ë²¡í„°1, ë²¡í„°2, ë²¡í„° ì‚¬ì´ì¦ˆ
 {
 	int *dev_a = 0;
 	int *dev_b = 0;
@@ -62,7 +62,7 @@ cudaError_t addWithCuda(int *c, const int *a, const int *b, unsigned int size) /
 	cudaError_t cudaStatus;
 
 	// Choose which GPU to run on, change this on a multi-GPU system.
-	//¸ÖÆ¼ GPU ½Ã½ºÅÛ È¯°æ¿¡¼­ ½ÇÇàÇÒ GPU¸¦ ¼±ÅÃÇÏ´Â ÄÚµå. 
+	//ë©€í‹° GPU ì‹œìŠ¤í…œ í™˜ê²½ì—ì„œ ì‹¤í–‰í•  GPUë¥¼ ì„ íƒí•˜ëŠ” ì½”ë“œ. 
 	cudaStatus = cudaSetDevice(0);
 	if (cudaStatus != cudaSuccess) {
 		fprintf(stderr, "cudaSetDevice failed!  Do you have a CUDA-capable GPU installed?");
@@ -71,7 +71,7 @@ cudaError_t addWithCuda(int *c, const int *a, const int *b, unsigned int size) /
 
 
 	// Allocate GPU buffers for three vectors (two input, one output).
-	// Device(GPU)ÀÇ grid¿¡ ÀÖ´Â Global Memory¿¡ 3°³ÀÇ º¤ÅÍ¸¦ À§ÇÑ GPU¹öÆÛ¸¦ ÇÒ´çÇÑ´Ù.
+	// Device(GPU)ì˜ gridì— ìˆëŠ” Global Memoryì— 3ê°œì˜ ë²¡í„°ë¥¼ ìœ„í•œ GPUë²„í¼ë¥¼ í• ë‹¹í•œë‹¤.
 	cudaStatus = cudaMalloc((void**)&dev_c, size * sizeof(int));
 	if (cudaStatus != cudaSuccess) {
 		fprintf(stderr, "cudaMalloc failed!");
@@ -92,8 +92,8 @@ cudaError_t addWithCuda(int *c, const int *a, const int *b, unsigned int size) /
 
 
 	// Copy input vectors from host memory to GPU buffers.
-	// È£½ºÆ®¿¡ Á¸ÀçÇÏ´Â ¹öÆÛ¸¦ Device(GPU)¿¡ Á¸ÀçÇÏ´Â GPU¹öÆÛµé·Î º¹»çÇÑ´Ù.
-	cudaStatus = cudaMemcpy(dev_a, a, size * sizeof(int), cudaMemcpyHostToDevice); //cudaMemcpy´Â ºñµ¿±âÀü¼ÛÀ¸·Î ÀÛµ¿ÇÏ¸ç HostToHost, HostToDevice, DeviceToHost, DeviceToDevice  4°¡Áö Å¸ÀÔÀÌ °¡´ÉÇÔ.
+	// í˜¸ìŠ¤íŠ¸ì— ì¡´ì¬í•˜ëŠ” ë²„í¼ë¥¼ Device(GPU)ì— ì¡´ì¬í•˜ëŠ” GPUë²„í¼ë“¤ë¡œ ë³µì‚¬í•œë‹¤.
+	cudaStatus = cudaMemcpy(dev_a, a, size * sizeof(int), cudaMemcpyHostToDevice); //cudaMemcpyëŠ” ë¹„ë™ê¸°ì „ì†¡ìœ¼ë¡œ ì‘ë™í•˜ë©° HostToHost, HostToDevice, DeviceToHost, DeviceToDevice  4ê°€ì§€ íƒ€ì…ì´ ê°€ëŠ¥í•¨.
 	if (cudaStatus != cudaSuccess) {
 		fprintf(stderr, "cudaMemcpy failed!");
 		goto Error;
@@ -107,13 +107,13 @@ cudaError_t addWithCuda(int *c, const int *a, const int *b, unsigned int size) /
 
 
 	// Launch a kernel on the GPU with one thread for each element.
-	// °¢ ¿ä¼Ò¿¡ ´ëÇØ ÇÏ³ªÀÇ ½º·¹µå·Î GPU¿¡¼­ Ä¿³Î ½ÃÀÛ
-	// N°³ÀÇ threadµéÀÌ °¢ data pair¿¡ ´ëÇÏ¿© ÇÑ ¹ø¾¿ÀÇ addKernel( )¸¦ ¼öÇà
-	addKernel << <1, size >> >(dev_c, dev_a, dev_b); // 1Àº »ı¼ºÇÒ ¾²·¹µå ºí·Ï ÀÇ ¼ö, size´Â ºí·Ï´ç ¾²·¹µå ¼ö
+	// ê° ìš”ì†Œì— ëŒ€í•´ í•˜ë‚˜ì˜ ìŠ¤ë ˆë“œë¡œ GPUì—ì„œ ì»¤ë„ ì‹œì‘
+	// Nê°œì˜ threadë“¤ì´ ê° data pairì— ëŒ€í•˜ì—¬ í•œ ë²ˆì”©ì˜ addKernel( )ë¥¼ ìˆ˜í–‰
+	addKernel << <1, size >> >(dev_c, dev_a, dev_b); // 1ì€ ìƒì„±í•  ì“°ë ˆë“œ ë¸”ë¡ ì˜ ìˆ˜, sizeëŠ” ë¸”ë¡ë‹¹ ì“°ë ˆë“œ ìˆ˜
 
 
-													 // Check for any errors launching the kernel
-													 // Ä¿³ÎÀ» ½ÃÀÛÇÏ´Â µ¿¾È ¿¡·¯°¡ ÀÖ¾ú´ÂÁö È®ÀÎÇÑ´Ù.
+	// Check for any errors launching the kernel
+	// ì»¤ë„ì„ ì‹œì‘í•˜ëŠ” ë™ì•ˆ ì—ëŸ¬ê°€ ìˆì—ˆëŠ”ì§€ í™•ì¸í•œë‹¤.
 	cudaStatus = cudaGetLastError();
 	if (cudaStatus != cudaSuccess) {
 		fprintf(stderr, "addKernel launch failed: %s\n", cudaGetErrorString(cudaStatus));
@@ -123,7 +123,7 @@ cudaError_t addWithCuda(int *c, const int *a, const int *b, unsigned int size) /
 
 	// cudaDeviceSynchronize waits for the kernel to finish, and returns
 	// any errors encountered during the launch.
-	// cudaDeviceSynchronize´Â Ä¿³ÎÀÌ ³¡¸¶Ä¥ ¶§ ±îÁö ±â´Ù¸°´Ù. ±×¸®°í ±× ½ÇÇàµ¿¾È¿¡ ¹ß»ıÇß´ø ¸ğµç ¿À·ù¸¦ ¹İÈ¯ÇÑ´Ù.
+	// cudaDeviceSynchronizeëŠ” ì»¤ë„ì´ ëë§ˆì¹  ë•Œ ê¹Œì§€ ê¸°ë‹¤ë¦°ë‹¤. ê·¸ë¦¬ê³  ê·¸ ì‹¤í–‰ë™ì•ˆì— ë°œìƒí–ˆë˜ ëª¨ë“  ì˜¤ë¥˜ë¥¼ ë°˜í™˜í•œë‹¤.
 	cudaStatus = cudaDeviceSynchronize();
 	if (cudaStatus != cudaSuccess) {
 		fprintf(stderr, "cudaDeviceSynchronize returned error code %d after launching addKernel!\n", cudaStatus);
@@ -132,7 +132,7 @@ cudaError_t addWithCuda(int *c, const int *a, const int *b, unsigned int size) /
 
 
 	// Copy output vector from GPU buffer to host memory.
-	// GPU buffer¿¡¼­ È£½ºÆ® ¸Ş¸ğ¸®·Î °á°úº¤ÅÍ¸¦ º¹»çÇÑ´Ù.
+	// GPU bufferì—ì„œ í˜¸ìŠ¤íŠ¸ ë©”ëª¨ë¦¬ë¡œ ê²°ê³¼ë²¡í„°ë¥¼ ë³µì‚¬í•œë‹¤.
 	cudaStatus = cudaMemcpy(c, dev_c, size * sizeof(int), cudaMemcpyDeviceToHost);
 	if (cudaStatus != cudaSuccess) {
 		fprintf(stderr, "cudaMemcpy failed!");
