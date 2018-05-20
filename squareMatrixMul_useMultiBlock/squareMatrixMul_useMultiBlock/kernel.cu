@@ -1,17 +1,17 @@
-//GPU¿¬»êÀ¸·Î Ã³¸®ÇØº¸´Â ¹öÀü
+//GPUì—°ì‚°ìœ¼ë¡œ ì²˜ë¦¬í•´ë³´ëŠ” ë²„ì „
 #include "cuda_runtime.h"
 #include "device_launch_parameters.h"
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <time.h> //clock(), time_tÅ¸ÀÔÀÇ º¯¼ö
+#include <time.h> //clock(), time_tíƒ€ì…ì˜ ë³€ìˆ˜
 
-__global__ void squareMatrixMulKernel(int *c, int *a, int *b, int arrayWidth);	//¹Ù·Î À§¿¡ ¼±¾ğÇÑ ÇÔ¼ö ¾È¿¡¼­ ¾²·¹µå »ı¼º°ú ÇÔ²² È£ÃâµÇ´Â ÇÔ¼ö, host¿¡¼­ È£Ãâ°¡´ÉÇÏ¸ç Device¿¡¼­ ½ÇÇàµÇ´Â Ä¿³Î ÇÔ¼ö
-cudaError_t squareMatrixMulWithGPU(int *c, int *a, int *b, int arrayWidth);		// µÎ Á¤¹æÇà·ÄÀÇ °ö¼À¿¬»êÀ» GPU¿¡¼­ ¼öÇàÇÏ´Â ÇÔ¼ö
-void squareMatrixMulWithCPU(int *c, int *a, int *b, int arrayWidth);			// µÎ Á¤¹æÇà·ÄÀÇ °ö¼À¿¬»êÀ» CPU¿¡¼­ ¼öÇàÇÏ´Â ÇÔ¼ö 
-void initArrayToRandom(int *array, int arrayWidth);								// ·£´ıÇÑ ¼ö·Î Çà·ÄÀ» ÃÊ±âÈ­ ÇÏ´Â ÇÔ¼ö 
-void initArrayToZero(int *array, int arrayWidth);								// 0À¸·Î Çà·ÄÀ» ÃÊ±âÈ­ ÇÏ´Â ÇÔ¼ö
-void printArrayAllElement(int *array, int arrayWidth);							// Çà·ÄÀÇ ¸ğµç ¿ø¼Ò¸¦ Ãâ·ÂÇÏ´Â ÇÔ¼ö
+__global__ void squareMatrixMulKernel(int *c, int *a, int *b, int arrayWidth);	//ë°”ë¡œ ìœ„ì— ì„ ì–¸í•œ í•¨ìˆ˜ ì•ˆì—ì„œ ì“°ë ˆë“œ ìƒì„±ê³¼ í•¨ê»˜ í˜¸ì¶œë˜ëŠ” í•¨ìˆ˜, hostì—ì„œ í˜¸ì¶œê°€ëŠ¥í•˜ë©° Deviceì—ì„œ ì‹¤í–‰ë˜ëŠ” ì»¤ë„ í•¨ìˆ˜
+cudaError_t squareMatrixMulWithGPU(int *c, int *a, int *b, int arrayWidth);	// ë‘ ì •ë°©í–‰ë ¬ì˜ ê³±ì…ˆì—°ì‚°ì„ GPUì—ì„œ ìˆ˜í–‰í•˜ëŠ” í•¨ìˆ˜
+void squareMatrixMulWithCPU(int *c, int *a, int *b, int arrayWidth);		// ë‘ ì •ë°©í–‰ë ¬ì˜ ê³±ì…ˆì—°ì‚°ì„ CPUì—ì„œ ìˆ˜í–‰í•˜ëŠ” í•¨ìˆ˜ 
+void initArrayToRandom(int *array, int arrayWidth);				// ëœë¤í•œ ìˆ˜ë¡œ í–‰ë ¬ì„ ì´ˆê¸°í™” í•˜ëŠ” í•¨ìˆ˜ 
+void initArrayToZero(int *array, int arrayWidth);				// 0ìœ¼ë¡œ í–‰ë ¬ì„ ì´ˆê¸°í™” í•˜ëŠ” í•¨ìˆ˜
+void printArrayAllElement(int *array, int arrayWidth);				// í–‰ë ¬ì˜ ëª¨ë“  ì›ì†Œë¥¼ ì¶œë ¥í•˜ëŠ” í•¨ìˆ˜
 
 int main()
 {
@@ -21,12 +21,12 @@ int main()
 
 	int arrayWidth;
 
-	//ÀÌ ÇÔ¼ö°¡ ¸ŞÀÎÇÔ¼ö¿¡¼­ ÀÛµ¿ÇØ¾ß °°Àº ¼ö°¡ ¾È³ª¿À°ÔµÊ.
+	//ì´ í•¨ìˆ˜ê°€ ë©”ì¸í•¨ìˆ˜ì—ì„œ ì‘ë™í•´ì•¼ ê°™ì€ ìˆ˜ê°€ ì•ˆë‚˜ì˜¤ê²Œë¨.
 	srand(time(NULL));
 
 	while (1)
 	{
-		printf("Çà·Ä³Êºñ : ");
+		printf("í–‰ë ¬ë„ˆë¹„ : ");
 		scanf("%d", &arrayWidth);
 
 		a = (int*)malloc(sizeof(int)*arrayWidth*arrayWidth);
@@ -34,11 +34,11 @@ int main()
 		c = (int*)malloc(sizeof(int)*arrayWidth*arrayWidth);
 
 
-		//¿¬»êÀ» ½ÃÀÛÇÏ±âÀü º¯¼öµé ÃÊ±âÈ­
+		//ì—°ì‚°ì„ ì‹œì‘í•˜ê¸°ì „ ë³€ìˆ˜ë“¤ ì´ˆê¸°í™”
 		initArrayToRandom(a, arrayWidth);
 		initArrayToRandom(b, arrayWidth);
 
-		//µÎ Á¤¹æÇà·ÄÀÇ °ö¼À¿¬»ê(CPU¿¡¼­)
+		//ë‘ ì •ë°©í–‰ë ¬ì˜ ê³±ì…ˆì—°ì‚°(CPUì—ì„œ)
 		initArrayToZero(c, arrayWidth);
 		squareMatrixMulWithCPU(c, a, b, arrayWidth);
 
@@ -54,7 +54,7 @@ int main()
 		//printf("\n");
 
 
-		//µÎ Á¤¹æÇà·ÄÀÇ °ö¼À¿¬»ê(GPU¿¡¼­)
+		//ë‘ ì •ë°©í–‰ë ¬ì˜ ê³±ì…ˆì—°ì‚°(GPUì—ì„œ)
 		initArrayToZero(c, arrayWidth);
 		cudaError_t cudaStatus = squareMatrixMulWithGPU(c, a, b, arrayWidth);
 
@@ -64,7 +64,7 @@ int main()
 			return 1;
 		}
 
-		//°á°úÈ®ÀÎ
+		//ê²°ê³¼í™•ì¸
 		//printArrayAllElement(c, arrayWidth);
 
 		// cudaDeviceReset must be called before exiting in order for profiling and
@@ -88,18 +88,18 @@ __global__ void squareMatrixMulKernel(int *c, int *a, int *b, int arrayWidth)
 {
 	float sum = 0;
 
-	//Çà·Ä¿¡¼­ °è»êÇÏ·Á°í ÇÏ´Â À§Ä¡ÀÇ ÀÎµ¦½º ÀÌ°ÍÀº °ø½ÄÈ­ µÈ°ÍÀÌ¹Ç·Î ¿Ü¿ìÁø ¸»ÀÚ.
+	//í–‰ë ¬ì—ì„œ ê³„ì‚°í•˜ë ¤ê³  í•˜ëŠ” ìœ„ì¹˜ì˜ ì¸ë±ìŠ¤ ì´ê²ƒì€ ê³µì‹í™” ëœê²ƒì´ë¯€ë¡œ ì™¸ìš°ì§„ ë§ì.
 	int col = blockIdx.x * blockDim.x + threadIdx.x;
 	int row = blockIdx.y * blockDim.y + threadIdx.y;
 
 
-	//ºí·Ï´ç ¾²·¹µå°¡ 4x4ÀÌ°í
-	//ºí·ÏÀÇ °³¼ö°¡ 1x1ÀÌ¸é
+	//ë¸”ë¡ë‹¹ ì“°ë ˆë“œê°€ 4x4ì´ê³ 
+	//ë¸”ë¡ì˜ ê°œìˆ˜ê°€ 1x1ì´ë©´
 	//printf("%d, %d / %d, %d / %d, %d\n", blockDim.x, blockDim.y, blockIdx.x, blockIdx.y, threadIdx.x, threadIdx.y);
-	// 4, 4, 0, 0, x, y ÀÌ·¸°Ô ¾Õ¿¡ 4°³ÀÇ ¼ıÀÚ´Â °íÁ¤µÈ °ÍÀ» º¼ ¼ö ÀÖ¾ú´Ù.
-	//blockDim : ºí·Ï ¾ÈÂÊ¿¡ Æ÷ÇÔµÈ ¾²·¹µå°¡ ¾î¶² ¤±x¤± Â÷¿øÀ¸·Î µÇ¾îÀÖ´ÂÁö.
-	//blockIdx : ºí·ÏÀÇ ÀÎµ¦½º
-	//threadIdx : ¾²·¹µåÀÇ ÀÎµ¦½º
+	// 4, 4, 0, 0, x, y ì´ë ‡ê²Œ ì•ì— 4ê°œì˜ ìˆ«ìëŠ” ê³ ì •ëœ ê²ƒì„ ë³¼ ìˆ˜ ìˆì—ˆë‹¤.
+	//blockDim : ë¸”ë¡ ì•ˆìª½ì— í¬í•¨ëœ ì“°ë ˆë“œê°€ ì–´ë–¤ ã…xã… ì°¨ì›ìœ¼ë¡œ ë˜ì–´ìˆëŠ”ì§€.
+	//blockIdx : ë¸”ë¡ì˜ ì¸ë±ìŠ¤
+	//threadIdx : ì“°ë ˆë“œì˜ ì¸ë±ìŠ¤
 
 	for (int i = 0; i < arrayWidth; ++i)
 	{
@@ -119,10 +119,8 @@ cudaError_t squareMatrixMulWithGPU(int *c, int *a, int *b, int arrayWidth)
 	cudaError_t cudaStatus;
 
 
-
-
-	//ÃÖÀûÀÇ ºí·Ï ÇÏ³ª´ç ¾²·¹µåÀÇ ¼ö°¡ 16x16ÀÌ¶ó°í ÇÏÀÚ.
-	//±×·¯¸é 16º¸´Ù ÀÛÀ¸¸é¼­ arrayWidthÀÇ °ø¾à¼öÀÎ ¼ö¸¦ Ã£¾Æ¼­ ±× ¼ö¸¦ ºí·Ï ÇÏ³ª´ç ¾²·¹µåÀÇ ¼ö¸¦ ÁöÁ¤ÇØÁà¾ß ÇÑ´Ù. 
+	//ìµœì ì˜ ë¸”ë¡ í•˜ë‚˜ë‹¹ ì“°ë ˆë“œì˜ ìˆ˜ê°€ 16x16ì´ë¼ê³  í•˜ì.
+	//ê·¸ëŸ¬ë©´ 16ë³´ë‹¤ ì‘ìœ¼ë©´ì„œ arrayWidthì˜ ê³µì•½ìˆ˜ì¸ ìˆ˜ë¥¼ ì°¾ì•„ì„œ ê·¸ ìˆ˜ë¥¼ ë¸”ë¡ í•˜ë‚˜ë‹¹ ì“°ë ˆë“œì˜ ìˆ˜ë¥¼ ì§€ì •í•´ì¤˜ì•¼ í•œë‹¤. 
 	int threadWidth = 0;
 
 	for (int i = 16; i > 0; --i)
@@ -134,23 +132,22 @@ cudaError_t squareMatrixMulWithGPU(int *c, int *a, int *b, int arrayWidth)
 		}
 	}
 
-	//¿©±â¼­ dimBlockÀÇ Å©±â´Â ÀÔ·Â¹ŞÀº ¹è¿­ÀÇ ³Êºñ¿¡ µû¶ó ´Ş¶óÁ®¾ß ÇÑ´Ù. ¾È±×·¯¸é ¿¬»êÀÌ Æ²¾îÁ® Àß¸øµÈ °á°ú¸¦ ¹Ş¾Æº¼ ¼ö ÀÖÀ» °ÍÀÌ´Ù. 
-	dim3 dimBlock(threadWidth, threadWidth);												// ºí·Ï ÇÏ³ª ´ç ¾²·¹µå ¼ö 
-	dim3 dimGrid(arrayWidth / dimBlock.x, arrayWidth / dimBlock.y);		// »ı¼ºÇÒ ºí·ÏÀÇ °³¼ö
+	//ì—¬ê¸°ì„œ dimBlockì˜ í¬ê¸°ëŠ” ì…ë ¥ë°›ì€ ë°°ì—´ì˜ ë„ˆë¹„ì— ë”°ë¼ ë‹¬ë¼ì ¸ì•¼ í•œë‹¤. ì•ˆê·¸ëŸ¬ë©´ ì—°ì‚°ì´ í‹€ì–´ì ¸ ì˜ëª»ëœ ê²°ê³¼ë¥¼ ë°›ì•„ë³¼ ìˆ˜ ìˆì„ ê²ƒì´ë‹¤. 
+	dim3 dimBlock(threadWidth, threadWidth);												// ë¸”ë¡ í•˜ë‚˜ ë‹¹ ì“°ë ˆë“œ ìˆ˜ 
+	dim3 dimGrid(arrayWidth / dimBlock.x, arrayWidth / dimBlock.y);		// ìƒì„±í•  ë¸”ë¡ì˜ ê°œìˆ˜
 
-																		//¿¹½Ã) ³Êºñ°¡ 12ÀÎ Çà·Ä Áï 12*12Çà·ÄÀÌ Á¸ÀçÇÑ´Ù Ä¡ÀÚ. ±×·±µ¥ ¿ì¸®´Â ºí·Ï ÇÏ³ª´ç 4*4ÀÇ ¾²·¹µå¸¦ °¡Áö°Ô ÇÏ¿´À¸¹Ç·Î ÇÑ¹ø¿¡ º´·ÄÃ³¸®·Î ¿¬»êÇØ¹ö¸®·Á¸é ºí·ÏÀº 3*3°³ÀÇ ºí·ÏÀÌ ÇÊ¿äÇÏ´Ù.
-	printf("ºí·Ï´ç ¾²·¹µå ¼ö : %d x %d, ºí·ÏÀÇ ¼ö : %d x %d\n\n", threadWidth, threadWidth, arrayWidth / dimBlock.x, arrayWidth / dimBlock.y);
+																		//ì˜ˆì‹œ) ë„ˆë¹„ê°€ 12ì¸ í–‰ë ¬ ì¦‰ 12*12í–‰ë ¬ì´ ì¡´ì¬í•œë‹¤ ì¹˜ì. ê·¸ëŸ°ë° ìš°ë¦¬ëŠ” ë¸”ë¡ í•˜ë‚˜ë‹¹ 4*4ì˜ ì“°ë ˆë“œë¥¼ ê°€ì§€ê²Œ í•˜ì˜€ìœ¼ë¯€ë¡œ í•œë²ˆì— ë³‘ë ¬ì²˜ë¦¬ë¡œ ì—°ì‚°í•´ë²„ë¦¬ë ¤ë©´ ë¸”ë¡ì€ 3*3ê°œì˜ ë¸”ë¡ì´ í•„ìš”í•˜ë‹¤.
+	printf("ë¸”ë¡ë‹¹ ì“°ë ˆë“œ ìˆ˜ : %d x %d, ë¸”ë¡ì˜ ìˆ˜ : %d x %d\n\n", threadWidth, threadWidth, arrayWidth / dimBlock.x, arrayWidth / dimBlock.y);
 
 
-
-	//¸ÖÆ¼ GPU ½Ã½ºÅÛ È¯°æ¿¡¼­ ½ÇÇàÇÒ GPU¸¦ ¼±ÅÃÇÏ´Â ÄÚµå. 
+	//ë©€í‹° GPU ì‹œìŠ¤í…œ í™˜ê²½ì—ì„œ ì‹¤í–‰í•  GPUë¥¼ ì„ íƒí•˜ëŠ” ì½”ë“œ. 
 	cudaStatus = cudaSetDevice(0);
 	if (cudaStatus != cudaSuccess) {
 		fprintf(stderr, "cudaSetDevice failed!  Do you have a CUDA-capable GPU installed?");
 		goto Error;
 	}
 
-	// Device(GPU)ÀÇ grid¿¡ ÀÖ´Â Global Memory¿¡ 3°³ÀÇ º¤ÅÍ¸¦ À§ÇÑ GPU¹öÆÛ¸¦ ÇÒ´çÇÑ´Ù.
+	// Device(GPU)ì˜ gridì— ìˆëŠ” Global Memoryì— 3ê°œì˜ ë²¡í„°ë¥¼ ìœ„í•œ GPUë²„í¼ë¥¼ í• ë‹¹í•œë‹¤.
 	cudaStatus = cudaMalloc((void**)&dev_c, arrayWidth * arrayWidth * sizeof(int));
 	if (cudaStatus != cudaSuccess) {
 		fprintf(stderr, "cudaMalloc failed!");
@@ -169,8 +166,8 @@ cudaError_t squareMatrixMulWithGPU(int *c, int *a, int *b, int arrayWidth)
 		goto Error;
 	}
 
-	// È£½ºÆ®¿¡ Á¸ÀçÇÏ´Â ¹öÆÛ¸¦ Device(GPU)¿¡ Á¸ÀçÇÏ´Â GPU¹öÆÛµé·Î º¹»çÇÑ´Ù.
-	cudaStatus = cudaMemcpy(dev_a, a, arrayWidth * arrayWidth * sizeof(int), cudaMemcpyHostToDevice); //cudaMemcpy´Â ºñµ¿±âÀü¼ÛÀ¸·Î ÀÛµ¿ÇÏ¸ç HostToHost, HostToDevice, DeviceToHost, DeviceToDevice  4°¡Áö Å¸ÀÔÀÌ °¡´ÉÇÔ.
+	// í˜¸ìŠ¤íŠ¸ì— ì¡´ì¬í•˜ëŠ” ë²„í¼ë¥¼ Device(GPU)ì— ì¡´ì¬í•˜ëŠ” GPUë²„í¼ë“¤ë¡œ ë³µì‚¬í•œë‹¤.
+	cudaStatus = cudaMemcpy(dev_a, a, arrayWidth * arrayWidth * sizeof(int), cudaMemcpyHostToDevice); //cudaMemcpyëŠ” ë¹„ë™ê¸°ì „ì†¡ìœ¼ë¡œ ì‘ë™í•˜ë©° HostToHost, HostToDevice, DeviceToHost, DeviceToDevice  4ê°€ì§€ íƒ€ì…ì´ ê°€ëŠ¥í•¨.
 	if (cudaStatus != cudaSuccess) {
 		fprintf(stderr, "cudaMemcpy failed!");
 		goto Error;
@@ -186,32 +183,29 @@ cudaError_t squareMatrixMulWithGPU(int *c, int *a, int *b, int arrayWidth)
 	cudaEvent_t start, stop;
 	float gapTime = 0;
 
-	//ÀÌº¥Æ® °´Ã¼»ı¼º
+	//ì´ë²¤íŠ¸ ê°ì²´ìƒì„±
 	cudaEventCreate(&start);
 	cudaEventCreate(&stop);
 
-	cudaEventRecord(start, 0);		 //½ÃÀÛ½Ã°£ ÀúÀå
+	cudaEventRecord(start, 0);	//ì‹œì‘ì‹œê°„ ì €ì¥
+
+	squareMatrixMulKernel << < dimGrid, dimBlock >> > (dev_c, dev_a, dev_b, arrayWidth); // ì™¼ìª½ 2ê°œì˜ ë³€ìˆ˜ëŠ” ì“°ë ˆë“œë¥¼ ìƒì„±í•˜ëŠ” ì¡°ê±´, ì˜¤ë¥¸ìª½ 4ê°œì˜ ë³€ìˆ˜ë“¤ì€ ì»¤ë„í•¨ìˆ˜ì˜ ë§¤ê°œë³€ìˆ˜
+
+	cudaEventRecord(stop, 0);	//ëë‚œì‹œê°„ ì €ì¥
+
+	cudaEventSynchronize(stop); 	//stopì´ë²¤íŠ¸ê°€ ê¸°ë¡ë  ë•Œ ê¹Œì§€ ì—¬ê¸°ì„œ ë©ˆì¶°ìˆëŠ”ë‹¤.
 
 
-									 // °¢ ¿ä¼Ò¿¡ ´ëÇØ ÇÏ³ªÀÇ ½º·¹µå·Î GPU¿¡¼­ Ä¿³Î ½ÃÀÛ
-									 // N°³ÀÇ threadµéÀÌ °¢ data pair¿¡ ´ëÇÏ¿© ÇÑ ¹ø¾¿ÀÇ addKernel( )¸¦ ¼öÇà
-	squareMatrixMulKernel << < dimGrid, dimBlock >> > (dev_c, dev_a, dev_b, arrayWidth); // ¿ŞÂÊ 2°³ÀÇ º¯¼ö´Â ¾²·¹µå¸¦ »ı¼ºÇÏ´Â Á¶°Ç, ¿À¸¥ÂÊ 4°³ÀÇ º¯¼öµéÀº Ä¿³ÎÇÔ¼öÀÇ ¸Å°³º¯¼ö
+	cudaEventElapsedTime(&gapTime, start, stop); // ì‹œì‘ì‹œê°„ê³¼ ëë‚œ ì‹œê°„ì˜ ì°¨ë¥¼ ê³„ì‚°í•˜ì—¬ ì €ì¥í•œë‹¤.
 
-	cudaEventRecord(stop, 0);		//³¡³­½Ã°£ ÀúÀå
-
-	cudaEventSynchronize(stop); 	//stopÀÌº¥Æ®°¡ ±â·ÏµÉ ¶§ ±îÁö ¿©±â¼­ ¸ØÃçÀÖ´Â´Ù.
-
-
-	cudaEventElapsedTime(&gapTime, start, stop); // ½ÃÀÛ½Ã°£°ú ³¡³­ ½Ã°£ÀÇ Â÷¸¦ °è»êÇÏ¿© ÀúÀåÇÑ´Ù.
-
-												 //ÀÌº¥Æ® °´Ã¼Á¦°Å
+	//ì´ë²¤íŠ¸ ê°ì²´ì œê±°
 	cudaEventDestroy(start);
 	cudaEventDestroy(stop);
 
 
-	printf("¿¬»ê½Ã°£ ÃøÁ¤(GPU) : %f ms\n", gapTime);
+	printf("ì—°ì‚°ì‹œê°„ ì¸¡ì •(GPU) : %f ms\n", gapTime);
 
-	// Ä¿³ÎÀ» ½ÃÀÛÇÏ´Â µ¿¾È ¿¡·¯°¡ ÀÖ¾ú´ÂÁö È®ÀÎÇÑ´Ù.
+	// ì»¤ë„ì„ ì‹œì‘í•˜ëŠ” ë™ì•ˆ ì—ëŸ¬ê°€ ìˆì—ˆëŠ”ì§€ í™•ì¸í•œë‹¤.
 	cudaStatus = cudaGetLastError();
 	if (cudaStatus != cudaSuccess) {
 		fprintf(stderr, "squareMatrixMulKernel launch failed: %s\n", cudaGetErrorString(cudaStatus));
@@ -219,7 +213,7 @@ cudaError_t squareMatrixMulWithGPU(int *c, int *a, int *b, int arrayWidth)
 	}
 
 
-	// cudaDeviceSynchronize´Â Ä¿³ÎÀÌ ³¡¸¶Ä¥ ¶§ ±îÁö ±â´Ù¸°´Ù. ±×¸®°í ±× ½ÇÇàµ¿¾È¿¡ ¹ß»ıÇß´ø ¸ğµç ¿À·ù¸¦ ¹İÈ¯ÇÑ´Ù.
+	// cudaDeviceSynchronizeëŠ” ì»¤ë„ì´ ëë§ˆì¹  ë•Œ ê¹Œì§€ ê¸°ë‹¤ë¦°ë‹¤. ê·¸ë¦¬ê³  ê·¸ ì‹¤í–‰ë™ì•ˆì— ë°œìƒí–ˆë˜ ëª¨ë“  ì˜¤ë¥˜ë¥¼ ë°˜í™˜í•œë‹¤.
 	cudaStatus = cudaDeviceSynchronize();
 	if (cudaStatus != cudaSuccess) {
 		fprintf(stderr, "cudaDeviceSynchronize returned error code %d after launching squareMatrixMulKernel!\n", cudaStatus);
@@ -227,7 +221,7 @@ cudaError_t squareMatrixMulWithGPU(int *c, int *a, int *b, int arrayWidth)
 	}
 
 
-	// GPU buffer¿¡¼­ È£½ºÆ® ¸Ş¸ğ¸®·Î °á°úº¤ÅÍ¸¦ º¹»çÇÑ´Ù.
+	// GPU bufferì—ì„œ í˜¸ìŠ¤íŠ¸ ë©”ëª¨ë¦¬ë¡œ ê²°ê³¼ë²¡í„°ë¥¼ ë³µì‚¬í•œë‹¤.
 	cudaStatus = cudaMemcpy(c, dev_c, arrayWidth * arrayWidth * sizeof(int), cudaMemcpyDeviceToHost);
 	if (cudaStatus != cudaSuccess) {
 		fprintf(stderr, "cudaMemcpy failed!");
@@ -247,7 +241,7 @@ void squareMatrixMulWithCPU(int *c, int *a, int *b, int arrayWidth)
 	clock_t startTime, endTime;
 	double gapTime;
 
-	startTime = clock(); //¿¬»êÀÇ ½ÃÀÛ½Ã°£ Ã¼Å©
+	startTime = clock(); //ì—°ì‚°ì˜ ì‹œì‘ì‹œê°„ ì²´í¬
 
 
 	for (int i = 0; i < arrayWidth; i++) {
@@ -264,11 +258,11 @@ void squareMatrixMulWithCPU(int *c, int *a, int *b, int arrayWidth)
 		}
 	}
 
-	endTime = clock();	//¿¬»êÀÇ ³¡³­½Ã°£ Ã¼Å©
+	endTime = clock();//ì—°ì‚°ì˜ ëë‚œì‹œê°„ ì²´í¬
 
-	gapTime = (double)endTime - startTime; // °æ°úÇÑÅ¬·ÏÀÇÆ½¼ö / ÃÊ´çÅ¬·°¼ö
+	gapTime = (double)endTime - startTime;
 
-	printf("¿¬»ê½Ã°£ ÃøÁ¤(CPU) : %f ms\n", gapTime);
+	printf("ì—°ì‚°ì‹œê°„ ì¸¡ì •(CPU) : %f ms\n", gapTime);
 }
 
 void initArrayToRandom(int *array, int arrayWidth)
@@ -276,7 +270,7 @@ void initArrayToRandom(int *array, int arrayWidth)
 	int arrayTotalCount = arrayWidth * arrayWidth;
 
 	for (int i = 0; i < arrayTotalCount; i++)
-		array[i] = rand() % 2; // 0 ~ 4-1 ¹üÀ§ÀÇ ·£´ıÁ¤¼ö »ı¼º.
+		array[i] = rand() % 2; // 0 ~ 4-1 ë²”ìœ„ì˜ ëœë¤ì •ìˆ˜ ìƒì„±.
 }
 
 void initArrayToZero(int *array, int arrayWidth)
